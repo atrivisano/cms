@@ -1,11 +1,8 @@
 ---
-import Layout from '../../../layouts/Layout.astro';
-import MediaManager from './index.vue';
-import AuthMiddleware from '../../../components/AuthMiddleware.vue';
+import AuthenticatedLayout from '../../../layouts/AuthenticatedLayout.astro';
+import MediaManager from './_index.vue';
 ---
 
-<Layout title="Media - ModernCMS">
-  <AuthMiddleware client:load requireAuth={true}>
-    <MediaManager client:load />
-  </AuthMiddleware>
-</Layout>
+<AuthenticatedLayout title="Media - ModernCMS">
+    <MediaManager client:load/>
+</AuthenticatedLayout>

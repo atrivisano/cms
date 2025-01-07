@@ -1,11 +1,8 @@
 ---
-import Layout from '../../layouts/AuthenticatedLayout.astro';
-import AdminDashboard from './index.vue';
-import AuthMiddleware from '../../components/AuthMiddleware.vue';
+import AuthenticatedLayout from '../../layouts/AuthenticatedLayout.astro';
+import AdminDashboard from './_index.vue';
 ---
 
-<Layout title="Admin Dashboard - ModernCMS">
-  <AuthMiddleware client:load requireAuth={true}>
-    <AdminDashboard client:load />
-  </AuthMiddleware>
-</Layout>
+<AuthenticatedLayout title="Admin Dashboard - ModernCMS">
+  <AdminDashboard client:load />
+</AuthenticatedLayout>

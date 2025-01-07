@@ -1,11 +1,11 @@
 ---
-import Layout from '../../../layouts/Layout.astro';
-import CategoriesList from './index.vue';
+import AuthenticatedLayout from '../../../layouts/AuthenticatedLayout.astro';
+import CategoriesList from './_index.vue';
 import AuthMiddleware from '../../../components/AuthMiddleware.vue';
 ---
 
-<Layout title="Categories - ModernCMS">
+<AuthenticatedLayout title="Categories - ModernCMS">
   <AuthMiddleware client:load requireAuth={true}>
     <CategoriesList client:load />
   </AuthMiddleware>
-</Layout>
+</AuthenticatedLayout>

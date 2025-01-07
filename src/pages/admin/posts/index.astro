@@ -1,11 +1,8 @@
 ---
-import Layout from '../../../layouts/Layout.astro';
-import PostsList from './index.vue';
-import AuthMiddleware from '../../../components/AuthMiddleware.vue';
+import AuthenticatedLayout from '../../../layouts/AuthenticatedLayout.astro';
+import PostsList from './_index.vue';
 ---
 
-<Layout title="Posts - ModernCMS">
-  <AuthMiddleware client:load requireAuth={true}>
-    <PostsList client:load />
-  </AuthMiddleware>
-</Layout>
+<AuthenticatedLayout title="Posts - ModernCMS">
+  <PostsList client:load />
+</AuthenticatedLayout>
