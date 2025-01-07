@@ -1,0 +1,11 @@
+---
+import Layout from '../layouts/Layout.astro';
+import LoginForm from '../components/LoginForm.vue';
+import AuthMiddleware from '../components/AuthMiddleware.vue';
+---
+
+<Layout title="Login - ModernCMS">
+  <AuthMiddleware client:load>
+    <LoginForm client:load />
+  </AuthMiddleware>
+</Layout>

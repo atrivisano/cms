@@ -1,0 +1,11 @@
+---
+import Layout from '../layouts/Layout.astro';
+import RegisterForm from '../components/RegisterForm.vue';
+import AuthMiddleware from '../components/AuthMiddleware.vue';
+---
+
+<Layout title="Register - ModernCMS">
+  <AuthMiddleware client:load>
+    <RegisterForm client:load />
+  </AuthMiddleware>
+</Layout>

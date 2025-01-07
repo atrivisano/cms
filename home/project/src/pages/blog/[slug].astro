@@ -1,0 +1,156 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { supabase } from '../../lib/supabase';
+
+export async function getStaticPaths() {
+  const { data: posts } = await supabase
+    .from('posts')
+    .select('slug')
+    .eq('status', 'published');
+
+  return posts?.map(post => ({
+    params: { slug: post.slug },
+  })) || [];
+}
+
+const { slug } = Astro.params;
+
+// Fetch the post with author and categories
+const { data: post } = await supabase
+  .from('posts')
+  .select(`
+    *,
+    profiles (
+      name
+    ),
+    posts_categories (
+      categories (
+        name,
+        slug
+      )
+    )
+  `)
+  .eq('slug', slug)
+  .eq('status', 'published')
+  .single();
+
+if (!post) {
+  return Astro.redirect('/404');
+}
+
+// Parse the content from JSON
+const content = JSON.parse(post.content)?.blocks?.[0]?.content || '';
+---
+
+<Layout title={`${post.title} - ModernCMS`}>
+  <article class="relative py-16 bg-white overflow-hidden">
+    {post.featured_image && (
+      <div class="absolute inset-0">
+        <div class="absolute inset-0 bg-gradient-to-b from-black/50 to-transparent h-96"></div>
+        <img
+          class="w-full h-96 object-cover"
+          src={post.featured_image}
+          alt={post.title}
+        />
+      </div>
+    )}
+
+    <div class="relative px-4 sm:px-6 lg:px-8">
+      <div class="max-w-prose mx-auto">
+        <!-- Post Header -->
+        <div class={`text-center ${post.featured_image ? 'text-white' : 'text-gray-900'} mb-8`}>
+          {post.posts_categories?.length > 0 && (
+            <div class="flex justify-center gap-2 mb-4">
+              {post.posts_categories.map(({ categories }) => (
+                <a
+                  href={`/blog/category/${categories.slug}`}
+                  class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary-100 text-primary-800 hover:bg-primary-200 transition-colors duration-200"
+                >
+                  {categories.name}
+                </a>
+              ))}
+            </div>
+          )}
+          <h1 class="text-4xl font-extrabold tracking-tight sm:text-5xl">
+            {post.title}
+          </h1>
+          {post.excerpt && (
+            <p class={`mt-4 text-xl ${post.featured_image ? 'text-gray-100' : 'text-gray-500'}`}>
+              {post.excerpt}
+            </p>
+          )}
+        </div>
+
+        <!-- Author and Date -->
+        <div class="flex items-center justify-center space-x-4 mb-16">
+          <div class="flex items-center">
+            <div class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
+              <span class="text-gray-500 font-medium">
+                {post.profiles?.name?.[0]?.toUpperCase() || 'A'}
+              </span>
+            </div>
+            <div class="ml-3">
+              <p class="text-sm font-medium text-gray-900">
+                {post.profiles?.name}
+              </p>
+              <div class="flex space-x-1 text-sm text-gray-500">
+                <time datetime={post.published_at}>
+                  {new Date(post.published_at).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  })}
+                </time>
+                <span aria-hidden="true">&middot;</span>
+                <span>{Math.ceil(content.length / 1000)} min read</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Post Content -->
+        <div class="mt-6 prose prose-primary prose-lg text-gray-500 mx-auto">
+          {content.split('\n').map((paragraph) => (
+            <p>{paragraph}</p>
+          ))}
+        </div>
+
+        <!-- Share Links -->
+        <div class="mt-16 flex justify-center space-x-6 border-t border-gray-200 pt-8">
+          <a 
+            href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(post.title)}&url=${encodeURIComponent(`${Astro.url}`)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-gray-400 hover:text-gray-500"
+          >
+            <span class="sr-only">Share on Twitter</span>
+            <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+            </svg>
+          </a>
+          <a 
+            href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(`${Astro.url}`)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-gray-400 hover:text-gray-500"
+          >
+            <span class="sr-only">Share on LinkedIn</span>
+            <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+            </svg>
+          </a>
+          <a 
+            href={`mailto:?subject=${encodeURIComponent(post.title)}&body=${encodeURIComponent(`Check out this post: ${Astro.url}`)}`}
+            class="text-gray-400 hover:text-gray-500"
+          >
+            <span class="sr-only">Share via Email</span>
+            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </article>
+</Layout>
+---
