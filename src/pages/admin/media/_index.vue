@@ -245,7 +245,7 @@ import {supabase} from '../../../lib/supabase'
 import UploadModal from '../../../components/UploadModal.vue'
 import ViewButton from "../../../components/ViewButton.vue";
 
-const viewMode = ref('grid')
+const viewMode = ref('list')
 const searchQuery = ref('')
 const typeFilter = ref('')
 const sortBy = ref('newest')

@@ -3,7 +3,7 @@ import {ref} from "vue";
 
 const emit = defineEmits(['toggle-view-mode'])
 
-const viewMode = ref('grid')
+const viewMode = ref('list')
 
 const toggleView = () => {
     viewMode.value = viewMode.value === 'grid' ? 'list' : 'grid';
